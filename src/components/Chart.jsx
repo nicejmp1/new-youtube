@@ -33,7 +33,8 @@ const Chart = ({ title, showCalendar, selectedDate, onDateChange, minDate, maxDa
                     q: query,
                     type: 'video',
                     maxResults: 5,
-                    key: 'AIzaSyDFZmImF6hDYvEfx0-1OtblZ9DIhdV8RSA',
+                    videoCategoryId: '10', // 음악 카테고리 ID
+                    key: `${process.env.REACT_APP_YOUTUBE_API_KEY}`,
                 },
             });
             setYoutubeResults(response.data.items);

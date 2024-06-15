@@ -11,6 +11,7 @@ import Mymusic from "./pages/Mymusic";
 import ChartList from "./pages/ChartList";
 import PlayList from "./pages/PlayList";
 import MusicPlayerProvider from "./context/MusicPlayerProvider";
+import SearchPage from "./pages/SearchPage";
 
 const App = () => {
     return (
@@ -24,6 +25,7 @@ const App = () => {
                         <Route path="/mymusic" element={<Mymusic />} />
                         <Route path="/playlist/:id" element={<PlayList />} />
                         <Route path="/chart/:id" element={<ChartList />} />
+                        <Route path="/search/:searchKeyword" element={<SearchPage />} />
                     </Routes>
                 </Main>
                 <Aside />

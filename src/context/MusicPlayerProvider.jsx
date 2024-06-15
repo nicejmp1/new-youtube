@@ -14,7 +14,7 @@ const MusicPlayerProvider = ({ children }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`/data/SONG.json`);
+                const response = await fetch(`/data/Jungmin.json`);
                 const data = await response.json();
                 setMusicData(data);
                 console.log(data)

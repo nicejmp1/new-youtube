@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { MdClose } from 'react-icons/md';
 import { toast } from 'react-toastify';
 
 const Modal = ({ isOpen, onClose, onAddToPlaylist }) => {
@@ -19,9 +20,9 @@ const Modal = ({ isOpen, onClose, onAddToPlaylist }) => {
     }
   }, [isOpen]);
 
-  const handleAddClick = (playlistId) => {
-    onAddToPlaylist(playlistId);
-    toast.success('나만의 리스트에 추가했습니다.');
+  const handleAddClick = (playlist) => {
+    onAddToPlaylist(playlist.id);
+    toast.success(`${playlist.name}리스트에 추가하였습니다.`);
     onClose();
   };
 
@@ -30,13 +31,13 @@ const Modal = ({ isOpen, onClose, onAddToPlaylist }) => {
   return (
     <div className="modal">
       <div className="modal-content">
-        <span className="close" onClick={onClose}>&times;</span>
+        <span className="close" onClick={onClose}><MdClose /></span>
         <h2>플레이리스트 선택</h2>
         <ul>
-          {playlists.map((playlist) => (
+          {playlists.map((playlist, index) => (
             <li key={playlist.id}>
-              {playlist.name}
-              <button onClick={() => handleAddClick(playlist.id)}>추가</button>
+              <span>{index + 1}. {playlist.name}</span>
+              <button className='modal-button' onClick={() => handleAddClick(playlist)}>추가</button>
             </li>
           ))}
         </ul>
