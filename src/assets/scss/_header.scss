@@ -11,6 +11,8 @@
     /* Firefox */
     -ms-overflow-style: none;
     /* Internet Explorer and Edge */
+    transition: all 0.5s;
+
 
     >h1 {
         padding: 2rem 2rem 1rem 2rem;
@@ -133,5 +135,12 @@
             background-color: var(--white);
             color: var(--black);
         }
+    }
+}
+
+@media (max-width: 960px) {
+    #header {
+        left: -260px;
+        transition: all 0.5s;
     }
 }

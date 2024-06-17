@@ -1,9 +1,9 @@
 import React from "react";
 
-const Main = (prop) => {
+const Main = ({ children, isSidebarVisible }) => {
     return (
-        <main id="main" role="main">
-            {prop.children}
+        <main id="main" role="main" className={isSidebarVisible ? 'sidebar-visible' : ''}>
+            {children}
         </main>
     );
 };

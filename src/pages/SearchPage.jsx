@@ -23,20 +23,11 @@ const SearchPage = () => {
                         part: 'snippet',
                         q: searchKeyword,
                         type: 'video',
-                        videoCategoryId: '10', // 음악 카테고리 ID
-                        maxResults: 10,
+                        maxResults: 10, // 결과 수를 20으로 증가시킴
                         key: process.env.REACT_APP_YOUTUBE_API_KEY,
                     },
                 });
-
-                // 결과 필터링: 채널 이름 또는 제목에 특정 키워드가 포함된 경우만 유지
-                const filteredResults = response.data.items.filter(item => {
-                    const title = item.snippet.title.toLowerCase();
-                    const channelTitle = item.snippet.channelTitle.toLowerCase();
-                    return title.includes('music') || channelTitle.includes('music') || channelTitle.includes('official');
-                });
-
-                setYoutubeResults(filteredResults);
+                setYoutubeResults(response.data.items);
                 setSelectedTitle(searchKeyword);
             } catch (error) {
                 console.error('YouTube 검색에 실패했습니다.', error);

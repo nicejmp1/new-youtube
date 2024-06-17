@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Chart from '../components/Chart';
+import PlayChart from '../components/PlayChart';
 
 const Playlist = () => {
   const { id } = useParams();
@@ -14,7 +14,7 @@ const Playlist = () => {
   return (
     <section id="playlist">
       {playlist.items.length > 0 ? (
-        <Chart
+        <PlayChart
           title={`${playlist.name} 리스트`}
           data={playlist.items}
           showCalendar={false}

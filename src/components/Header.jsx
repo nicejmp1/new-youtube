@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FcRating, FcPlus, FcApproval, FcDeleteDatabase } from "react-icons/fc";
 import { IoMusicalNotes } from "react-icons/io5";
 import DeleteModal from './DeleteModal';
+import { toast } from 'react-toastify';
 
 const Header = () => {
   const [showInput, setShowInput] = useState(false);
@@ -42,6 +43,7 @@ const Header = () => {
       localStorage.setItem('playlistCount', newCount.toString());
       setPlaylistCount(newCount);
       setNewItem('');
+      toast.success(`${newPlaylist.name} 리스트를 추가하였습니다.`);
       setShowInput(false);
     }
   };

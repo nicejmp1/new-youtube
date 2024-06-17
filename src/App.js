@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import Header from "./components/Header";
@@ -12,13 +12,17 @@ import ChartList from "./pages/ChartList";
 import PlayList from "./pages/PlayList";
 import MusicPlayerProvider from "./context/MusicPlayerProvider";
 import SearchPage from "./pages/SearchPage";
+import Footer from "./components/Footer";
 
 const App = () => {
+    const [isSidebarVisible, setIsSidebarVisible] = useState(false);
+
     return (
         <MusicPlayerProvider>
             <BrowserRouter>
                 <Header />
-                <Main>
+                <Aside isSidebarVisible={isSidebarVisible} setIsSidebarVisible={setIsSidebarVisible} />
+                <Main isSidebarVisible={isSidebarVisible}>
                     <Search />
                     <Routes>
                         <Route path="/" element={<Home />} />
@@ -28,7 +32,7 @@ const App = () => {
                         <Route path="/search/:searchKeyword" element={<SearchPage />} />
                     </Routes>
                 </Main>
-                <Aside />
+                <Footer />
             </BrowserRouter>
         </MusicPlayerProvider>
     );

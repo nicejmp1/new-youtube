@@ -1,11 +1,9 @@
-import React, { forwardRef, useContext, useState } from 'react'
+import React, { forwardRef, useContext, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import Modal from './Modal'
-
+import { toast } from 'react-toastify';
+import Modal from './Modal';
 import { FcCalendar } from 'react-icons/fc';
 import { MdFormatListBulletedAdd, MdOutlinePlayCircleFilled, MdClose, MdHive } from 'react-icons/md';
 import { MusicPlayerContext } from '../context/MusicPlayerProvider';
@@ -34,12 +32,13 @@ const Chart = ({ title, showCalendar, selectedDate, onDateChange, minDate, maxDa
                     type: 'video',
                     maxResults: 5,
                     videoCategoryId: '10', // 음악 카테고리 ID
-                    key: `${process.env.REACT_APP_YOUTUBE_API_KEY}`,
+                    key: process.env.REACT_APP_YOUTUBE_API_KEY,
                 },
             });
             setYoutubeResults(response.data.items);
         } catch (error) {
             console.error('YouTube 검색에 실패했습니다.', error);
+            toast.error('YouTube 검색에 실패했습니다.');
         }
     };
 
@@ -54,11 +53,11 @@ const Chart = ({ title, showCalendar, selectedDate, onDateChange, minDate, maxDa
             videoID: result.id.videoId,
             imageURL: result.snippet.thumbnails.default.url,
             artist: result.snippet.channelTitle,
-            rank: 1
+            rank: 1 // 초기 rank 설정
         };
         addTrackToList(newTrack);
-        toast.success('현재음악을 재생시켰습니다.');
         playTrack(0);
+        toast.success('현재 음악을 재생시켰습니다.');
     };
 
     const handleAddToList = (result) => {
@@ -67,7 +66,7 @@ const Chart = ({ title, showCalendar, selectedDate, onDateChange, minDate, maxDa
             videoID: result.id.videoId,
             imageURL: result.snippet.thumbnails.default.url,
             artist: result.snippet.channelTitle,
-            rank: 1
+            rank: 1 // 초기 rank 설정
         };
         addTrackToEnd(newTrack);
         toast.success('리스트에 추가했습니다.');
@@ -79,7 +78,7 @@ const Chart = ({ title, showCalendar, selectedDate, onDateChange, minDate, maxDa
             videoID: result.id.videoId,
             imageURL: result.snippet.thumbnails.default.url,
             artist: result.snippet.channelTitle,
-            rank: 1
+            rank: 1 // 초기 rank 설정
         });
         setIsModalOpen(true);
     };
@@ -87,8 +86,11 @@ const Chart = ({ title, showCalendar, selectedDate, onDateChange, minDate, maxDa
     const handleAddToPlaylist = (playlistId) => {
         const playlist = JSON.parse(localStorage.getItem(playlistId));
         if (playlist && selectedTrack) {
+            selectedTrack.rank = playlist.items.length + 1; // 현재 항목 수에 1을 더한 값으로 rank 설정
             playlist.items.push(selectedTrack);
             localStorage.setItem(playlistId, JSON.stringify(playlist));
+        } else {
+            toast.error('리스트에 추가하는데 실패했습니다.');
         }
     };
 
@@ -145,7 +147,6 @@ const Chart = ({ title, showCalendar, selectedDate, onDateChange, minDate, maxDa
                     <span className='close' onClick={() => setYoutubeResults([])}><MdClose /></span>
                 </section>
             )}
-            <ToastContainer />
 
             <Modal
                 isOpen={isModalOpen}
@@ -153,9 +154,7 @@ const Chart = ({ title, showCalendar, selectedDate, onDateChange, minDate, maxDa
                 onAddToPlaylist={handleAddToPlaylist}
             />
         </>
-    )
+    );
 }
 
-export default Chart
-
-
+export default Chart;

@@ -1,9 +1,14 @@
 #main {
     background-color: var(--mainBg);
     margin-left: 260px;
-    margin-right: 400px;
+    padding-right: 30px;
     position: relative;
     min-height: 100vh;
+    transition: all 0.5s;
+
+    &.sidebar-visible {
+        padding-right: 400px;
+    }
 }
 
 .loading {
@@ -55,4 +60,12 @@
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.75);
+}
+
+
+@media (max-width:960px) {
+    #main {
+        margin-left: 0;
+        transition: all 0.5s;
+    }
 }
