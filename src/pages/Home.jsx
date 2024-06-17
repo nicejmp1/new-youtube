@@ -11,16 +11,20 @@ const Home = () => {
 
   const { addTrackToList, addTrackToEnd, playTrack } = useContext(MusicPlayerContext); // 컨텍스트에서 플레이어 기능 가져오기
 
-  // 캐시 키 및 캐시 시간 키
+  // 캐시 키
   const latestMusicCacheKey = 'latestMusicVideos';
-  const latestMusicCacheTimeKey = 'latestMusicCacheTime';
   const recommendedCacheKey = 'recommendedVideos';
-  const recommendedCacheTimeKey = 'recommendedCacheTime';
 
-  // 캐시 지속 시간 (24시간)
-  const cacheDuration = 24 * 60 * 60 * 1000; // 24시간 (밀리초 단위)
+  // 캐시를 지우는 함수
+  const clearCache = () => {
+    localStorage.removeItem(latestMusicCacheKey);
+    localStorage.removeItem(recommendedCacheKey);
+  };
 
   useEffect(() => {
+    // 컴포넌트가 마운트될 때 캐시를 지우기
+    clearCache();
+
     // 최신 음악 비디오를 가져오는 함수
     const fetchLatestMusicVideos = async () => {
       const oneMonthAgo = new Date();
@@ -34,7 +38,7 @@ const Home = () => {
             params: {
               part: 'snippet',
               maxResults: 5,
-              q: '최신 음악',
+              q: '최신가요',
               type: 'video',
               key: process.env.REACT_APP_YOUTUBE_API_KEY,
               publishedAfter: formattedDate,
@@ -46,7 +50,6 @@ const Home = () => {
 
         // 캐시에 저장
         localStorage.setItem(latestMusicCacheKey, JSON.stringify(videos));
-        localStorage.setItem(latestMusicCacheTimeKey, Date.now().toString());
       } catch (error) {
         console.error('Error fetching latest music videos:', error);
       }
@@ -72,34 +75,17 @@ const Home = () => {
 
         // 캐시에 저장
         localStorage.setItem(recommendedCacheKey, JSON.stringify(videos));
-        localStorage.setItem(recommendedCacheTimeKey, Date.now().toString());
       } catch (error) {
         console.error('Error fetching recommended videos:', error);
       }
     };
 
-    // 캐시된 최신 음악 비디오 데이터 가져오기
-    const cachedLatestMusicVideos = localStorage.getItem(latestMusicCacheKey);
-    const latestMusicCacheTime = localStorage.getItem(latestMusicCacheTimeKey);
+    // 최신 음악 비디오 데이터 가져오기
+    fetchLatestMusicVideos();
 
-    // 캐시된 추천 비디오 데이터 가져오기
-    const cachedRecommendedVideos = localStorage.getItem(recommendedCacheKey);
-    const recommendedCacheTime = localStorage.getItem(recommendedCacheTimeKey);
-
-    // 최신 음악 비디오 캐시 유효성 검사 및 데이터 가져오기
-    if (cachedLatestMusicVideos && latestMusicCacheTime && Date.now() - parseInt(latestMusicCacheTime, 10) < cacheDuration) {
-      setVideos(JSON.parse(cachedLatestMusicVideos));
-    } else {
-      fetchLatestMusicVideos();
-    }
-
-    // 추천 비디오 캐시 유효성 검사 및 데이터 가져오기
-    if (cachedRecommendedVideos && recommendedCacheTime && Date.now() - parseInt(recommendedCacheTime, 10) < cacheDuration) {
-      setRecommendedVideos(JSON.parse(cachedRecommendedVideos));
-    } else {
-      fetchRecommendedVideos();
-    }
-  }, [cacheDuration]);
+    // 추천 비디오 데이터 가져오기
+    fetchRecommendedVideos();
+  }, []);
 
   // 재생 버튼 클릭 시 호출되는 함수
   const handlePlayNow = (video) => {
