@@ -138,6 +138,12 @@
     }
 }
 
+.delete-button {
+    margin-left: 10px;
+    vertical-align: -1px;
+    cursor: pointer;
+}
+
 @media (max-width: 960px) {
     #header {
         left: -260px;

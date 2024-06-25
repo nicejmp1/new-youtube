@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from 'react'
+import React, { createContext, useEffect, useState } from 'react';
 
 export const MusicPlayerContext = createContext();
 
@@ -14,16 +14,26 @@ const MusicPlayerProvider = ({ children }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`/data/Jungmin.json`);
-                const data = await response.json();
-                setMusicData(data);
-                console.log(data)
+                const savedMusicData = localStorage.getItem('musicData');
+                if (savedMusicData) {
+                    setMusicData(JSON.parse(savedMusicData));
+                } else {
+                    const response = await fetch(`/data/Jungmin.json`);
+                    const data = await response.json();
+                    setMusicData(data);
+                }
             } catch (error) {
-                console.error('데이터를 가져오는데 실패했습니다.', error);
+                console.error('Failed to fetch data:', error);
             }
         };
         fetchData();
     }, []);
+
+    useEffect(() => {
+        if (musicData.length > 0) {
+            localStorage.setItem('musicData', JSON.stringify(musicData));
+        }
+    }, [musicData]);
 
     const playTrack = (index) => {
         setCurrentTrackIndex(index);
@@ -36,11 +46,7 @@ const MusicPlayerProvider = ({ children }) => {
     };
 
     const nextTrack = () => {
-        if (isShuffling) {
-            setCurrentTrackIndex(Math.floor(Math.random() * musicData.length));
-        } else {
-            setCurrentTrackIndex((prevIndex) => (prevIndex + 1) % musicData.length);
-        }
+        setCurrentTrackIndex((prevIndex) => (isShuffling ? Math.floor(Math.random() * musicData.length) : (prevIndex + 1) % musicData.length));
         setIsPlaying(true);
         setPlayed(0);
     };
@@ -70,21 +76,22 @@ const MusicPlayerProvider = ({ children }) => {
     const handleTrackEnd = () => {
         if (isRepeating) {
             setPlayed(0);
-            setCurrentTrackIndex(currentTrackIndex);  // 현재 트랙 인덱스를 명시적으로 다시 설정
             setIsPlaying(true);
         } else {
             nextTrack();
         }
     };
 
-    // 재생 목록에 트랙을 추가하는 함수
     const addTrackToList = (track) => {
         setMusicData((prevMusicData) => [track, ...prevMusicData]);
     };
 
-    // 재생 목록의 끝에 트랙을 추가하는 함수
     const addTrackToEnd = (track) => {
         setMusicData((prevMusicData) => [...prevMusicData, track]);
+    };
+
+    const removeTrack = (index) => {
+        setMusicData((prevMusicData) => prevMusicData.filter((_, i) => i !== index));
     };
 
     return (
@@ -107,11 +114,12 @@ const MusicPlayerProvider = ({ children }) => {
                 toggleRepeat,
                 handleTrackEnd,
                 addTrackToList,
-                addTrackToEnd
+                addTrackToEnd,
+                removeTrack
             }}>
             {children}
         </MusicPlayerContext.Provider>
-    )
-}
+    );
+};
 
-export default MusicPlayerProvider
+export default MusicPlayerProvider;

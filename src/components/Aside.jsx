@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { MusicPlayerContext } from '../context/MusicPlayerProvider';
-import { IoMusicalNotes, IoPlaySkipForward, IoPlaySkipBack, IoPlay, IoPause, IoRepeat, IoShuffleOutline, IoMenu, IoClose, IoVolumeHigh } from 'react-icons/io5';
+import { IoMusicalNotes, IoPlaySkipForward, IoPlaySkipBack, IoPlay, IoPause, IoRepeat, IoShuffleOutline, IoMenu, IoClose, IoVolumeHigh, IoTrash } from 'react-icons/io5';
 import ReactPlayer from 'react-player';
 
 const Aside = ({ isSidebarVisible, setIsSidebarVisible }) => {
@@ -20,7 +20,8 @@ const Aside = ({ isSidebarVisible, setIsSidebarVisible }) => {
     isShuffling,
     toggleRepeat,
     isRepeating,
-    handleTrackEnd
+    handleTrackEnd,
+    removeTrack
   } = useContext(MusicPlayerContext);
 
   const currentTrackRef = useRef(null);
@@ -173,6 +174,7 @@ const Aside = ({ isSidebarVisible, setIsSidebarVisible }) => {
               >
                 <span className="img" style={{ backgroundImage: `url(${track.imageURL})` }}></span>
                 <span className="title">{track.title}</span>
+                <span className="remove" onClick={(e) => { e.stopPropagation(); removeTrack(index); }}><IoTrash /></span>
               </li>
             ))}
           </ul>

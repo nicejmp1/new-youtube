@@ -2,14 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FcRating, FcPlus, FcApproval, FcDeleteDatabase } from "react-icons/fc";
 import { IoMusicalNotes } from "react-icons/io5";
-import DeleteModal from './DeleteModal';
 import { toast } from 'react-toastify';
 
 const Header = () => {
   const [showInput, setShowInput] = useState(false);
   const [newItem, setNewItem] = useState('');
   const [playlistCount, setPlaylistCount] = useState(0);
-  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const count = localStorage.getItem('playlistCount') || 0;
@@ -48,8 +46,11 @@ const Header = () => {
     }
   };
 
-  const handleDeleteClick = () => {
-    setShowModal(true);
+  const handleDeleteClick = (playlistId) => {
+    const confirmDelete = window.confirm("정말로 삭제하시겠습니까?");
+    if (confirmDelete) {
+      handleDeleteItem(playlistId);
+    }
   };
 
   const handleDeleteItem = (playlistId) => {
@@ -69,7 +70,7 @@ const Header = () => {
     localStorage.removeItem(`playlist${playlistCount}`);
     localStorage.setItem('playlistCount', newCount.toString());
 
-    setShowModal(false);
+    toast.success('플레이리스트가 삭제되었습니다.');
   };
 
   const playlistLinks = [];
@@ -78,8 +79,11 @@ const Header = () => {
     const playlist = JSON.parse(localStorage.getItem(playlistKey) || "{}");
     if (playlist.name) {
       playlistLinks.push(
-        <li key={i}>
-          <Link to={`/playlist/${playlistKey}`}><span className='icon2'><FcApproval /></span>{playlist.name}</Link>
+        <li key={i} className="playlist-item">
+          <Link to={`/playlist/${playlistKey}`}><span className='icon2'><FcApproval /></span>{playlist.name}
+            <button onClick={() => handleDeleteClick(playlistKey)} className="delete-button"><FcDeleteDatabase /></button>
+          </Link>
+
         </li>
       );
     }
@@ -118,17 +122,7 @@ const Header = () => {
             </>
           )}
         </li>
-        <li>
-          <Link to='#' onClick={handleDeleteClick}><span className='icon2'><FcDeleteDatabase /></span>Delete</Link> {/* Delete 버튼 추가 */}
-        </li>
       </ul>
-      {showModal && (
-        <DeleteModal
-          isOpen={showModal}
-          onClose={() => setShowModal(false)}
-          onDeleteToPlaylist={handleDeleteItem}
-        />
-      )}
     </header>
   );
 }

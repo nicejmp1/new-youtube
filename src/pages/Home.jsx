@@ -12,6 +12,9 @@ const Home = () => {
 
   useEffect(() => {
     const fetchLatestMusicVideos = async () => {
+      localStorage.removeItem('latestMusicVideos');
+      localStorage.removeItem('recommendedVideos');
+
       const cachedVideos = localStorage.getItem('latestMusicVideos');
       if (cachedVideos) {
         setVideos(JSON.parse(cachedVideos));
@@ -27,16 +30,27 @@ const Home = () => {
               params: {
                 part: 'snippet',
                 maxResults: 5,
-                q: '최신',
+                q: '국내가요',
                 type: 'video',
                 key: process.env.REACT_APP_YOUTUBE_API_KEY,
                 publishedAfter: formattedDate,
               },
             }
           );
-          const videos = response.data.items;
-          setVideos(videos);
-          localStorage.setItem('latestMusicVideos', JSON.stringify(videos));
+          const videoIds = response.data.items.map(item => item.id.videoId);
+          const videoDetailsResponse = await axios.get(
+            `https://www.googleapis.com/youtube/v3/videos`,
+            {
+              params: {
+                part: 'contentDetails',
+                id: videoIds.join(','),
+                key: process.env.REACT_APP_YOUTUBE_API_KEY,
+              },
+            }
+          );
+          const embeddableVideos = response.data.items.filter((video, index) => videoDetailsResponse.data.items[index].contentDetails.embeddable);
+          setVideos(embeddableVideos);
+          localStorage.setItem('latestMusicVideos', JSON.stringify(embeddableVideos));
         } catch (error) {
           console.error('Error fetching latest music videos:', error);
         }
@@ -55,15 +69,26 @@ const Home = () => {
               params: {
                 part: 'snippet',
                 maxResults: 5,
-                q: '추천 음악',
+                q: 'J-POP',
                 type: 'video',
                 key: process.env.REACT_APP_YOUTUBE_API_KEY,
               },
             }
           );
-          const videos = response.data.items;
-          setRecommendedVideos(videos);
-          localStorage.setItem('recommendedVideos', JSON.stringify(videos));
+          const videoIds = response.data.items.map(item => item.id.videoId);
+          const videoDetailsResponse = await axios.get(
+            `https://www.googleapis.com/youtube/v3/videos`,
+            {
+              params: {
+                part: 'contentDetails',
+                id: videoIds.join(','),
+                key: process.env.REACT_APP_YOUTUBE_API_KEY,
+              },
+            }
+          );
+          const embeddableVideos = response.data.items.filter((video, index) => videoDetailsResponse.data.items[index].contentDetails.embeddable);
+          setRecommendedVideos(embeddableVideos);
+          localStorage.setItem('recommendedVideos', JSON.stringify(embeddableVideos));
         } catch (error) {
           console.error('Error fetching recommended videos:', error);
         }
@@ -116,11 +141,15 @@ const Home = () => {
 
   return (
     <div className='main__info'>
-      <h1>최신음악</h1>
+      <h1>국내가요</h1>
       <div className="video_list">
         {videos.map((video) => (
           <div key={video.id.videoId} className="video-item">
-            <img src={video.snippet.thumbnails.medium.url} alt={video.snippet.title} />
+            <img
+              src={video.snippet.thumbnails.medium.url}
+              alt={video.snippet.title}
+              onClick={() => handlePlayNow(video)}
+            />
             <h3>{video.snippet.title}</h3>
             <p>{video.snippet.channelTitle}</p>
             <div className="video-actions">
@@ -137,11 +166,15 @@ const Home = () => {
           </div>
         ))}
       </div>
-      <h2>추천리스트</h2>
+      <h2>J-POP</h2>
       <div className="video_list">
         {recommendedVideos.map((video) => (
           <div key={video.id.videoId} className="video-item">
-            <img src={video.snippet.thumbnails.medium.url} alt={video.snippet.title} />
+            <img
+              src={video.snippet.thumbnails.medium.url}
+              alt={video.snippet.title}
+              onClick={() => handlePlayNow(video)}
+            />
             <h3>{video.snippet.title}</h3>
             <p>{video.snippet.channelTitle}</p>
             <div className="video-actions">
