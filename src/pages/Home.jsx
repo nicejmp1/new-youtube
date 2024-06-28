@@ -30,27 +30,36 @@ const Home = () => {
               params: {
                 part: 'snippet',
                 maxResults: 5,
-                q: '국내가요',
+                q: '클럽노래',
                 type: 'video',
                 key: process.env.REACT_APP_YOUTUBE_API_KEY,
                 publishedAfter: formattedDate,
               },
             }
           );
+
           const videoIds = response.data.items.map(item => item.id.videoId);
+          console.log('Fetched video IDs:', videoIds);
+
           const videoDetailsResponse = await axios.get(
             `https://www.googleapis.com/youtube/v3/videos`,
             {
               params: {
-                part: 'contentDetails',
+                part: 'snippet,contentDetails,status',
                 id: videoIds.join(','),
                 key: process.env.REACT_APP_YOUTUBE_API_KEY,
               },
             }
           );
-          const embeddableVideos = response.data.items.filter((video, index) => videoDetailsResponse.data.items[index].contentDetails.embeddable);
+
+          console.log('Video Details Response:', videoDetailsResponse.data.items);
+
+          const embeddableVideos = videoDetailsResponse.data.items.filter(video => video.status.embeddable);
+
           setVideos(embeddableVideos);
           localStorage.setItem('latestMusicVideos', JSON.stringify(embeddableVideos));
+          console.log('Embeddable Videos:', embeddableVideos);
+
         } catch (error) {
           console.error('Error fetching latest music videos:', error);
         }
@@ -75,20 +84,29 @@ const Home = () => {
               },
             }
           );
+
           const videoIds = response.data.items.map(item => item.id.videoId);
+          console.log('Fetched video IDs:', videoIds);
+
           const videoDetailsResponse = await axios.get(
             `https://www.googleapis.com/youtube/v3/videos`,
             {
               params: {
-                part: 'contentDetails',
+                part: 'snippet,contentDetails,status',
                 id: videoIds.join(','),
                 key: process.env.REACT_APP_YOUTUBE_API_KEY,
               },
             }
           );
-          const embeddableVideos = response.data.items.filter((video, index) => videoDetailsResponse.data.items[index].contentDetails.embeddable);
+
+          console.log('Video Details Response:', videoDetailsResponse.data.items);
+
+          const embeddableVideos = videoDetailsResponse.data.items.filter(video => video.status.embeddable);
+
           setRecommendedVideos(embeddableVideos);
           localStorage.setItem('recommendedVideos', JSON.stringify(embeddableVideos));
+          console.log('Embeddable Videos:', embeddableVideos);
+
         } catch (error) {
           console.error('Error fetching recommended videos:', error);
         }
@@ -102,7 +120,7 @@ const Home = () => {
   const handlePlayNow = (video) => {
     const newTrack = {
       title: video.snippet.title,
-      videoID: video.id.videoId,
+      videoID: video.id,
       imageURL: video.snippet.thumbnails.default.url,
       artist: video.snippet.channelTitle,
       rank: 1
@@ -115,7 +133,7 @@ const Home = () => {
   const handleAddToList = (video) => {
     const newTrack = {
       title: video.snippet.title,
-      videoID: video.id.videoId,
+      videoID: video.id,
       imageURL: video.snippet.thumbnails.default.url,
       artist: video.snippet.channelTitle,
       rank: 1
@@ -127,7 +145,7 @@ const Home = () => {
   const handleAddToPlaylistClick = (video) => {
     const newTrack = {
       title: video.snippet.title,
-      videoID: video.id.videoId,
+      videoID: video.id,
       imageURL: video.snippet.thumbnails.default.url,
       artist: video.snippet.channelTitle,
       rank: 1
@@ -141,10 +159,10 @@ const Home = () => {
 
   return (
     <div className='main__info'>
-      <h1>국내가요</h1>
+      <h1>클럽노래</h1>
       <div className="video_list">
         {videos.map((video) => (
-          <div key={video.id.videoId} className="video-item">
+          <div key={video.id} className="video-item">
             <img
               src={video.snippet.thumbnails.medium.url}
               alt={video.snippet.title}
@@ -169,7 +187,7 @@ const Home = () => {
       <h2>J-POP</h2>
       <div className="video_list">
         {recommendedVideos.map((video) => (
-          <div key={video.id.videoId} className="video-item">
+          <div key={video.id} className="video-item">
             <img
               src={video.snippet.thumbnails.medium.url}
               alt={video.snippet.title}
